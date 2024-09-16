@@ -3,8 +3,9 @@
 
 const size_t len_array = 19;
 
-void qsort (int* array, const size_t len_array, size_t len_type, int (*compare_element) (int first_element, int second_element));
-int compare_int (int first_element, int second_element);
+void qsort (void* array, const size_t len_array, const size_t len_type, int (*compare_element) (void* first_element, void* second_element));
+int compare_int (void* first_element, void* second_element);
+void change_elemet (char* first_element, char* second_element, const size_t len_type);
 void print_array (int* array);
 
 int main ()
@@ -18,7 +19,7 @@ int main ()
     return 0;
 }
 
-void qsort (int* array, const size_t len_array, size_t len_type, int (*compare_element) (int first_element, int second_element))
+void qsort (void* array, const size_t len_array, const size_t len_type, int (*compare_element) (void* first_element, void* second_element))
 {
     assert (array);
     assert (compare_element);
@@ -27,19 +28,33 @@ void qsort (int* array, const size_t len_array, size_t len_type, int (*compare_e
     {
         for (int i = 0; i < g - 1; i++)
         {
-            if (((*compare_element) (array[i], array[i+1])) > 0)
+            if (((*compare_element) ((char*) array + i * len_type, (char*) array + (i + 1) * len_type)) > 0)
             {
-                int temporary = array[i];
-                array[i]      = array[i+1];
-                array[i+1]    = temporary;
+                change_elemet ((char*) array + i * len_type, (char*) array + (i + 1) * len_type, len_type);
             }
         }
     }
 }
 
-int compare_int (int first_element, int second_element)
+void change_elemet (char* first_element, char* second_element, const size_t len_type)
 {
-    return first_element - second_element;
+    assert (first_element);
+    assert (second_element);
+
+    for (int i = 0; i < len_type; i++)
+    {
+        char temporary    = second_element[i];
+        second_element[i] = first_element[i];
+        first_element[i]  = temporary;
+    }
+
+    
+
+}
+
+int compare_int (void* first_element, void* second_element)
+{
+    return *((int*) first_element) - *((int*)second_element);
 }
 
 void print_array (int* array)
