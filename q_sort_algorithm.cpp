@@ -10,10 +10,8 @@ int static partition (char* left, char* right, const size_t len_piece, const siz
 
 void static change_element (char* first_element, char* second_element, const size_t len_type);
 
-void static print_qsort (int* left, int* left_flag, int* pivot, int* right_flag, int* right, const size_t len_piece, const size_t len_type);
 
-
-int qsort (void* array, const size_t len_array, const size_t len_type, int (*compare_element) (void* first_element, void* second_element))
+int qsort (const void* array, const size_t len_array, const size_t len_type, int (*compare_element) (void* first_element, void* second_element))
 {
     assert (array);
     assert (compare_element);
