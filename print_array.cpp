@@ -3,9 +3,7 @@
 
 #include "print_array.h"
 
-const size_t len_array = 13;
-
-void print_array (int* array)
+void print_array (int* array, const size_t len_array)
 {
     assert (array);
 

@@ -6,156 +6,118 @@
 #include "print_array.h"
 #include "q_sort_algorithm.h"
 
-int static partition (int* left, int* right, const size_t len_piece, const size_t len_type, int (*compare_element) (void* first_element, void* second_element), int* array); 
+int static partition (char* left, char* right, const size_t len_piece, const size_t len_type, int (*compare_element) (void* first_element, void* second_element)); 
 
 void static change_element (char* first_element, char* second_element, const size_t len_type);
 
 void static print_qsort (int* left, int* left_flag, int* pivot, int* right_flag, int* right, const size_t len_piece, const size_t len_type);
 
 
-
-
-
-int qsort (int* array, const size_t len_array, const size_t len_type, int (*compare_element) (void* first_element, void* second_element))
+int qsort (void* array, const size_t len_array, const size_t len_type, int (*compare_element) (void* first_element, void* second_element))
 {
     assert (array);
     assert (compare_element);
 
-    int* left  = array;                  //Адрес левого конца рассматриваемого кусочка.
-    int* right = array + len_array - 1;  //Адрес правого конца рассматриваемого кусочка.
+    char* left  = (char*) array;                               //Адрес левого конца рассматриваемого кусочка.
+    char* right = (char*) array + (len_array - 1) * len_type;  //Адрес правого конца рассматриваемого кусочка.
 
-    const size_t len_piece = len_array;  //Длина кусочка.
+    const size_t len_piece = len_array;                        //Длина кусочка.
 
-    partition (left, right, len_piece, len_type, compare_element, array);
+    partition (left, right, len_piece, len_type, compare_element);
 
     return 0;
 }
 
 
-
-
-int static partition (int* left, int* right, const size_t len_piece, const size_t len_type, int (*compare_element) (void* first_element, void* second_element), int* array) 
+int static partition (char* left, char* right, const size_t len_piece, const size_t len_type, int (*compare_element) (void* first_element, void* second_element)) 
 {
     assert (left);
     assert (right);
     assert (compare_element);
 
-    print_array (array);
-
-    if (len_piece == 0 || len_piece == 1) 
+    if (len_piece == 0 || len_piece == 1)        //Если кусочек не имеет символов или имеет один символ, то его не нужно сортировать.
     {
-        return 0;
-    }
-
-    if (len_piece == 2) 
-    {
-        if (((*compare_element) (left, right)) >= 0)
-        {
-            change_element ((char*) left, (char*) right, len_type);
-        }
-
         return 0;
     }
 
     else
     {
 
-        int* pivot = left + (len_piece / 2);    //Адрес pivot кусочка.
+        char* pivot = left + (len_piece / 2) * len_type;   //Адрес pivot. !!! pivot - плохой элемент.
 
-        printf ("left = %d    pivot = %d  right = %d     len_piece = %d\n", *left, *pivot, *right, len_piece);
+        char* left_flag  = left;                           //Начальный левый  флаг. Этот флаг будет передвигаться от левого  конца кусочка вправо. Флаг указывает на элемент массива.
+        char* right_flag = right;                          //Начальный правый флаг. Этот флаг будет передвигаться от правого конца кусочка влево.  Флаг указывает на элемент массива.
 
-        int* left_flag  = left;
-        int* right_flag = right;
-
-        while (left_flag < right_flag)
+        while (left_flag < right_flag)                     //Пока флаги не пересеклись, будет продолжать менять элементы местами.
         {
-            while (((*compare_element) (left_flag, pivot)) < 0 && left_flag < pivot && left_flag < right_flag)
+            while (((*compare_element) (left_flag, pivot)) < 0 && left_flag < pivot && left_flag < right_flag)      //Пропускает хорошие левые элементы. Хороший левый элемент: < pivot, левее pivot, левее правого флага.
             {
-                left_flag += 1;
+                left_flag += len_type;
             }
 
-            if (left_flag >= right_flag) {break;}
+            if (left_flag >= right_flag) {break;}          //Прерывает, если флаги пересеклись.
 
-            while (((*compare_element) (right_flag, pivot)) >= 0 && right_flag > pivot && left_flag < right_flag)
+            while (((*compare_element) (right_flag, pivot)) >= 0 && right_flag > pivot && left_flag < right_flag)   //Пропускает хорошие правые элементы. Хороший правый элемент: > pivot, правее pivot, правее левого флага.  
             {
-                right_flag -= 1;
+                right_flag -= len_type;
             }
 
-            if (left_flag >= right_flag) {break;}
+            if (left_flag >= right_flag) {break;}            //Прерывает, если флаги пересеклись.
 
-            int check = 1;
-
-            printf ("left_flag = %d     right_flag = %d \n", *left_flag, *right_flag);
-
-            if (left_flag != pivot && right_flag != pivot)
+            if (left_flag != pivot && right_flag != pivot)   //Если оба флага не совпали с pivot, то меняет плохие элементы местами и двигает флаги.
             {
-                change_element ((char*) left_flag, (char*) right_flag, len_type);
+                change_element (left_flag, right_flag, len_type);
 
-                left_flag  += 1;
+                left_flag  += len_type;
 
-                if (left_flag == right_flag)
+                if (left_flag != right_flag)                 //Прерывает, если флаги пересеклись. Пример: left_flag = 4 и right_flag = 5  ->  left_flag = 5 и right_flag = 5 (!персеклись)   Без этой проверки в конце было бы: left_flag = 5 и right_flag = 4
                 {
-                    check = 0;
-                }
-
-                if (check == 1)
-                {
-                    right_flag -= 1;
+                    right_flag -= len_type;
                 }
             }
 
             else
             {
-                if (left_flag == pivot)
+                if (left_flag == pivot)                 //Если левый флаг совпал с pivot, то меняет плохие элементы; не двигает правый флаг, тк он теперь указывает на pivot, те на плохой элемент; двигает левый флаг.
                 {
-                    change_element ((char*) left_flag, (char*) right_flag, len_type);
+                    change_element (left_flag, right_flag, len_type);
 
                     pivot      = right_flag;
-                    left_flag += 1;
+                    left_flag += len_type;
                 }
 
-                else
+                else                  //Если правый флаг совпал с pivot, то меняет плохие элементы; не двигает левый флаг, тк он теперь указывает на pivot, те на плохой элемент; двигает правый флаг.
                 {
-                    change_element ((char*) left_flag, (char*) right_flag, len_type);
+                    change_element (left_flag, right_flag, len_type);
 
                     pivot       = left_flag;
-                    right_flag -= 1;
+                    right_flag -= len_type;
                 }
             }
-            
-            print_array (array);
         }
-
-        printf ("\n\n\n");
 
         size_t len_left_piece = 0;
 
-        for (int* ptr_element = left; ptr_element != pivot; ptr_element += 1) 
+        for (char* ptr_element = left; ptr_element != pivot; ptr_element += len_type)   //Считает количество символов слева от pivot без pivot.
         {
             assert (ptr_element >= left && ptr_element <= right);
 
             len_left_piece += 1;
         }
 
-        size_t len_right_piece = len_piece - len_left_piece;
+        size_t len_right_piece = len_piece - len_left_piece;          //Считает количество символов справа от pivot с pivot.
 
-        if (pivot == left)
+        if (pivot == left)   //Если pivot - cамый левый элемент, то выбрасывает его из рассмотрения и начинает сортировать элементы справа от pivot. (слева от pivot элементов нет.)
         {
-            partition (pivot + 1, right, (const size_t) len_right_piece - 1, len_type, compare_element, array); 
+            partition (pivot + len_type, right, (const size_t) len_right_piece - 1, len_type, compare_element);   //(len_right_piece - 1) - длина правого кусочка без pivot.
             return 0; 
         }
-
-        if (pivot != left)
-        {
-            partition (left,  pivot - 1, (const size_t) len_left_piece,  len_type, compare_element, array);
-        }
-
-        partition (pivot, right, (const size_t) len_right_piece, len_type, compare_element, array);
+    
+        partition (left,  pivot - len_type, (const size_t) len_left_piece,  len_type, compare_element);    //Сортирует элемента слева  от pivot, не включая его.
+        partition (pivot, right,            (const size_t) len_right_piece, len_type, compare_element);    //Сортирует элемента справа от pivot,    включая его.
 
         return 0;
     }
-
-    return 0;
 }
 
 void static change_element (char* first_element, char* second_element, const size_t len_type)

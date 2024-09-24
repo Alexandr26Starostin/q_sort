@@ -7,13 +7,13 @@
 
 int main ()
 {
-    int array [] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    
-    print_array (array);
+    int array [] = {3, 3, 3, 3, 3, 5, -60, 7, 3, 4, 11, 12, 13};  
+
+    print_array (array, 13);
 
     qsort (array, 13, sizeof (int), &compare_int);  
 
-    print_array (array);
+    print_array (array, 13);
 
     return 0;
 }
