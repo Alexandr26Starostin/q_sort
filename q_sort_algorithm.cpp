@@ -62,13 +62,10 @@ int static partition (int* left, int* right, const size_t len_piece, const size_
 
         int* pivot = left + (len_piece / 2);    //Адрес pivot кусочка.
 
-        printf ("%d\n", *pivot);
+        printf ("left = %d    pivot = %d  right = %d     len_piece = %d\n", *left, *pivot, *right, len_piece);
 
         int* left_flag  = left;
         int* right_flag = right;
-
-        //printf ("Begin.\n");
-        //print_qsort (left, left_flag, pivot, right_flag, right, len_piece, len_type);
 
         while (left_flag < right_flag)
         {
@@ -86,10 +83,9 @@ int static partition (int* left, int* right, const size_t len_piece, const size_
 
             if (left_flag >= right_flag) {break;}
 
-            //printf ("Find_numbers.\n");
-            //print_qsort (left, left_flag, pivot, right_flag, right, len_piece, len_type);
-
             int check = 1;
+
+            printf ("left_flag = %d     right_flag = %d \n", *left_flag, *right_flag);
 
             if (left_flag != pivot && right_flag != pivot)
             {
@@ -118,7 +114,7 @@ int static partition (int* left, int* right, const size_t len_piece, const size_
                     left_flag += 1;
                 }
 
-                if (right_flag == pivot)
+                else
                 {
                     change_element ((char*) left_flag, (char*) right_flag, len_type);
 
@@ -127,14 +123,9 @@ int static partition (int* left, int* right, const size_t len_piece, const size_
                 }
             }
             
-
-            //printf ("Change_numbers.\n");
-            //print_qsort (left, left_flag, pivot, right_flag, right, len_piece, len_type);
             print_array (array);
         }
 
-        //printf ("End.\n");
-        //print_qsort (left, left_flag, pivot, right_flag, right, len_piece, len_type);
         printf ("\n\n\n");
 
         size_t len_left_piece = 0;
@@ -148,8 +139,18 @@ int static partition (int* left, int* right, const size_t len_piece, const size_
 
         size_t len_right_piece = len_piece - len_left_piece;
 
-        partition (left,  pivot - 1, (const size_t) len_left_piece,  len_type, compare_element, array);
-        partition (pivot, right,     (const size_t) len_right_piece, len_type, compare_element, array);
+        if (pivot == left)
+        {
+            partition (pivot + 1, right, (const size_t) len_right_piece - 1, len_type, compare_element, array); 
+            return 0; 
+        }
+
+        if (pivot != left)
+        {
+            partition (left,  pivot - 1, (const size_t) len_left_piece,  len_type, compare_element, array);
+        }
+
+        partition (pivot, right, (const size_t) len_right_piece, len_type, compare_element, array);
 
         return 0;
     }
@@ -168,72 +169,4 @@ void static change_element (char* first_element, char* second_element, const siz
         second_element[index_byte] = first_element[index_byte];
         first_element[index_byte]  = temporary;
     }
-}
-
-//print_qsort (left, left_flag, pivot, right_flag, right, len_piece, len_type);
-
-void static print_qsort (int* left, int* left_flag, int* pivot, int* right_flag, int* right, const size_t len_piece, const size_t len_type)
-{
-    if (left_flag == right_flag)
-    {
-        for (int* ptr_element = left; ptr_element <= right; ptr_element += 1)
-            printf ("%3d ", *ptr_element); 
-    }
-    else
-    {
-        if (left_flag != pivot && right_flag != pivot)
-        {
-            for (int* ptr_element = left; ptr_element < left_flag; ptr_element += 1)
-                print_with_color (ORDINARY_STYLE, BLUE_TEXT, BLACK_BACKGROUND, "%3d ", *ptr_element);
-
-            print_with_color (ORDINARY_STYLE, TURQUOISE_TEXT, BLACK_BACKGROUND, "%3d ", *left_flag);
-
-            for (int* ptr_element = left_flag + 1; ptr_element < pivot; ptr_element += 1)
-                print_with_color (ORDINARY_STYLE, BLUE_TEXT, BLACK_BACKGROUND, "%3d ", *ptr_element);
-
-            print_with_color (ORDINARY_STYLE, YELLOW_TEXT, BLACK_BACKGROUND, "%3d ", *pivot);
-
-            for (int* ptr_element = pivot + 1; ptr_element < right_flag; ptr_element += 1)
-                print_with_color (ORDINARY_STYLE, WHITE_TEXT, BLACK_BACKGROUND, "%3d ", *ptr_element);
-
-            print_with_color (ORDINARY_STYLE, RED_TEXT, BLACK_BACKGROUND, "%3d ", *right_flag);
-
-            for (int* ptr_element = right_flag+ 1; ptr_element <= right; ptr_element += 1)
-                print_with_color (ORDINARY_STYLE, WHITE_TEXT, BLACK_BACKGROUND, "%3d ", *ptr_element);
-        }
-
-        if (left_flag == pivot)
-        {
-            for (int* ptr_element = left; ptr_element < pivot; ptr_element += 1)
-                print_with_color (ORDINARY_STYLE, BLUE_TEXT, BLACK_BACKGROUND, "%3d ", *ptr_element);
-
-            print_with_color (ORDINARY_STYLE, YELLOW_TEXT, BLACK_BACKGROUND, "%3d ", *pivot);
-
-            for (int* ptr_element = pivot + 1; ptr_element < right_flag; ptr_element += 1)
-                print_with_color (ORDINARY_STYLE, WHITE_TEXT, BLACK_BACKGROUND, "%3d ", *ptr_element);
-
-            print_with_color (ORDINARY_STYLE, RED_TEXT, BLACK_BACKGROUND, "%3d ", *right_flag);
-
-            for (int* ptr_element = right_flag+ 1; ptr_element <= right; ptr_element += 1)
-                print_with_color (ORDINARY_STYLE, WHITE_TEXT, BLACK_BACKGROUND, "%3d ", *ptr_element);  
-        }
-
-        if (right_flag == pivot)
-        {
-            for (int* ptr_element = left; ptr_element < left_flag; ptr_element += 1)
-                print_with_color (ORDINARY_STYLE, BLUE_TEXT, BLACK_BACKGROUND, "%3d ", *ptr_element);
-
-            print_with_color (ORDINARY_STYLE, TURQUOISE_TEXT, BLACK_BACKGROUND, "%3d ", *left_flag);
-
-            for (int* ptr_element = left_flag + 1; ptr_element < pivot; ptr_element += 1)
-                print_with_color (ORDINARY_STYLE, BLUE_TEXT, BLACK_BACKGROUND, "%3d ", *ptr_element);
-
-            print_with_color (ORDINARY_STYLE, YELLOW_TEXT, BLACK_BACKGROUND, "%3d ", *pivot);
-
-            for (int* ptr_element = pivot + 1; ptr_element <= right; ptr_element += 1)
-                print_with_color (ORDINARY_STYLE, WHITE_TEXT, BLACK_BACKGROUND, "%3d ", *ptr_element); 
-        }
-    }
-
-    printf ("\n\n");
 }
